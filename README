@@ -2,3 +2,22 @@ Small and simple parser of debsecan output - all it does is counting number of
 security issues per package. CVE information is not preserved as this utility
 was only meant to give a quick (and accurate) outlook on which installed
 packages have most security issues.
+
+Sample output:
+$ ./debsecan_abbrev
+ 14 libc6
+ 16 libavutil52
+ 16 libavfilter3
+ 16 libavdevice53
+ 16 libav-tools
+ 16 libavresample1
+ 16 libswscale2
+ 16 libavcodec54
+ 16 libavformat54
+ 20 libavutil51
+ 20 libavfilter2
+ 20 libavcodec53
+ 20 libavformat53
+ 20 ffmpeg
+
+[count of vulnerabilities] [name of affected package]
