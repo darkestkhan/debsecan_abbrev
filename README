@@ -1,0 +1,4 @@
+Small and simple parser of debsecan output - all it does is counting number of
+security issues per package. CVE information is not preserved as this utility
+was only meant to give a quick (and accurate) outlook on which installed
+packages have most security issues.
