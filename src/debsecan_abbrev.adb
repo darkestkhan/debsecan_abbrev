@@ -171,12 +171,36 @@ procedure debsecan_Abbrev is
   end Parse_Summary;
 
   ----------------------------------------------------------------------------
+  -- Compute total number of CVEs.
+  function Total (Item: in Package_Security_Info_Vectors.Vector)
+    return Package_Security_Info
+  is
+    package PSIV renames Package_Security_Info_Vectors;
 
+    Total_CVEs: Package_Security_Info;
+
+    procedure Total_Aux (Position: in PSIV.Cursor)
+    is
+    begin
+      Total_CVEs.Security :=
+        Total_CVEs.Security + PSIV.Element (Position).Security;
+    end Total_Aux;
+
+  begin
+    PSIV.Iterate (Item, Total_Aux'Access);
+    Total_CVEs.Package_Name := new String'("Total");
+    Total_CVEs.Hash_Of_Name := Ada.Strings.Hash (Total_CVEs.Package_Name.all);
+    return Total_CVEs;
+  end Total;
+  ----------------------------------------------------------------------------
+
+  use type Package_Security_Info_Vectors.Vector;
   Parsed_Summary: Package_Security_Info_Vectors.Vector;
 
 begin
   System ("debsecan >summary");
   Parsed_Summary := Parse_Summary;
   Package_Security_Info_Vectors_Sort.Sort (Parsed_Summary);
+  Parsed_Summary := Parsed_Summary & Total (Parsed_Summary);
   Put_Package_Security_Info_Vector (Parsed_Summary);
 end debsecan_Abbrev;

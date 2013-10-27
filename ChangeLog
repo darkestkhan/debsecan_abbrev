@@ -1,3 +1,8 @@
+2013-10-27  darkestkhan  <darkestkhan@gmail.com>
+
+	Add counter of total number of vulnerabilities.
+	* src/debsecan_abbrev.adb (Total): New function.
+
 2013-09-29  darkestkhan  <darkestkhan@gmail.com>
 
 	* README: Update README file.
