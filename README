@@ -21,3 +21,5 @@ $ ./debsecan_abbrev
  20 ffmpeg
 
 [count of vulnerabilities] [name of affected package]
+
+Depends on https://github.com/darkestkhan/xdg

@@ -1,3 +1,9 @@
+2013-11-02  darkestkhan  <darkestkhan@gmail.com>
+
+	Stop polluting CWD - follow XDG instead.
+	* debsecan_abbrev.gpr: Add dependency on xdg. < https://github.com/darkestkhan/xdg >
+	* src/debsecan_abbrev.adb (Cache_Home, Create_Cache_Home): New functions.
+
 2013-10-27  darkestkhan  <darkestkhan@gmail.com>
 
 	Add counter of total number of vulnerabilities.

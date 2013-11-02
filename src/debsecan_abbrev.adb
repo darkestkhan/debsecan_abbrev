@@ -31,9 +31,12 @@ with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 with Ada.Containers;
 with Ada.Containers.Vectors;
+with Ada.Directories;
 with Ada.Strings.Hash;
 with Ada.Strings.Fixed;
 use type Ada.Containers.Hash_Type;
+
+with XDG;
 
 procedure debsecan_Abbrev is
 
@@ -69,6 +72,38 @@ procedure debsecan_Abbrev is
     Hash_Of_Name  : Ada.Containers.Hash_Type;
     Security      : Natural := 0;
   end record;
+
+  ----------------------------------------------------------------------------
+  -- Return directory for cache data used by debsecan_abbrev.
+  function Cache_Home return String
+  is
+    Tmp: constant String := XDG.Cache_Home;
+    Dir: constant String := "debsecan_abbrev/";
+  begin
+    if Tmp (Tmp'Last .. Tmp'Last) = "/" then
+      return Tmp & Dir;
+    else
+      return Tmp & '/' & Dir;
+    end if;
+  end Cache_Home;
+
+  ----------------------------------------------------------------------------
+  -- Check if Cache_Home exists and if it is directory. If it doesn't exist
+  -- create path to Cache_Home. If it isn't directory raise Program_Error.
+  procedure Create_Cache_Home
+  is
+    package AD renames Ada.Directories;
+    use type AD.File_Kind;
+  begin
+    if AD.Exists (Cache_Home) then
+      if AD.Kind (Cache_Home) /= AD.Directory then
+        raise Program_Error with  "Fatal Error: " & Cache_Home &
+                                  " exists but isn't directory";
+      end if;
+    else
+      AD.Create_Path (Cache_Home);
+    end if;
+  end Create_Cache_Home;
 
   ----------------------------------------------------------------------------
   -- Check if two Package_Security_Info are describing the same package.
@@ -134,7 +169,7 @@ procedure debsecan_Abbrev is
       Element.Security := Element.Security + 1;
     end Increment;
   begin
-    TIO.Open (FD, TIO.In_File, "summary");
+    TIO.Open (FD, TIO.In_File, Cache_Home & "summary");
 
     Parse:
     while not TIO.End_Of_File (FD) loop
@@ -192,13 +227,15 @@ procedure debsecan_Abbrev is
     Total_CVEs.Hash_Of_Name := Ada.Strings.Hash (Total_CVEs.Package_Name.all);
     return Total_CVEs;
   end Total;
+
   ----------------------------------------------------------------------------
 
   use type Package_Security_Info_Vectors.Vector;
   Parsed_Summary: Package_Security_Info_Vectors.Vector;
 
 begin
-  System ("debsecan >summary");
+  Create_Cache_Home;
+  System ("debsecan >" & Cache_Home & "summary");
   Parsed_Summary := Parse_Summary;
   Package_Security_Info_Vectors_Sort.Sort (Parsed_Summary);
   Parsed_Summary := Parsed_Summary & Total (Parsed_Summary);

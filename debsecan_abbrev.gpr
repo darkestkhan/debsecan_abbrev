@@ -1,3 +1,4 @@
+with "xdg.gpr";
 project debsecan_Abbrev is
 
   Version := "0.1";
