@@ -1,3 +1,8 @@
+2013-11-27  darkestkhan  <darkestkhan@gmail.com>
+
+	Fix error when parsing data that has different identifier than CVE.
+	* src/debsecan_abbrev.adb (Parse_Summary): Fix parser error.
+
 2013-11-02  darkestkhan  <darkestkhan@gmail.com>
 
 	Stop polluting CWD - follow XDG instead.

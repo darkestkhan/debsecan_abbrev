@@ -156,6 +156,11 @@ procedure debsecan_Abbrev is
   -- Parse summary file.
   function Parse_Summary return Package_Security_Info_Vectors.Vector
   is
+    -- Line format of debsecan is:
+    -- <vulnerability_ID><space><package_name>[<space><severity>]
+
+    Parse_Error: exception;
+
     package TIO renames Ada.Text_IO;
     package Fixed renames Ada.Strings.Fixed;
     use type Package_Security_Info_Vectors.Vector;
@@ -168,6 +173,19 @@ procedure debsecan_Abbrev is
     begin
       Element.Security := Element.Security + 1;
     end Increment;
+
+    -- Return position of first space in line.
+    function Pos_Of_First_Space (Item: in String) return Natural
+    is
+    begin
+      for I in Item'Range loop
+        if Item (I) = ' ' then
+          return I;
+        end if;
+      end loop;
+      raise Parse_Error;
+    end Pos_Of_First_Space;
+
   begin
     TIO.Open (FD, TIO.In_File, Cache_Home & "summary");
 
@@ -177,23 +195,32 @@ procedure debsecan_Abbrev is
         package PSIV renames Package_Security_Info_Vectors;
         Line: constant String := TIO.Get_Line (FD);
         Element: Package_Security_Info;
-        Index: Natural := 15;
+        Start_Of_Package_Name: constant Natural := Pos_Of_First_Space (Line) + 1;
+        End_Of_Package_Name  : constant Natural :=
+          Fixed.Index (Line, " ", Start_Of_Package_Name );
       begin
-        Index := Fixed.Index (Line, " ", Index);
-        if Index = 0 then
-          Element.Hash_Of_Name := Ada.Strings.Hash (Line (15 .. Line'Last));
+        if End_Of_Package_Name = 0 then
+          Element.Hash_Of_Name :=
+            Ada.Strings.Hash
+              ( Line (Start_Of_Package_Name .. Line'Last)
+              );
         else
-          Element.Hash_Of_Name := Ada.Strings.Hash (Line (15 .. Index - 1));
+          Element.Hash_Of_Name :=
+            Ada.Strings.Hash
+              ( Line (Start_Of_Package_Name .. End_Of_Package_Name)
+              );
         end if;
 
         if PSIV.Contains (Result, Element) then
           PSIV.Update_Element
             (Result, PSIV.Find (Result, Element), Increment'Access);
         else
-          if Index = 0 then
-            Element.Package_Name := new String'(Line (15 .. Line'Last));
+          if End_Of_Package_Name = 0 then
+            Element.Package_Name :=
+              new String'(Line (Start_Of_Package_Name .. Line'Last));
           else
-            Element.Package_Name := new String'(Line (15 .. Index - 1));
+            Element.Package_Name :=
+              new String'(Line (Start_Of_Package_Name .. End_Of_Package_Name));
           end if;
           Element.Security := 1;
           Result := Result & Element;
