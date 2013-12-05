@@ -31,14 +31,13 @@ with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 with Ada.Containers;
 with Ada.Containers.Vectors;
-with Ada.Directories;
 with Ada.Strings.Hash;
 with Ada.Strings.Fixed;
 use type Ada.Containers.Hash_Type;
 
 with XDG;
 
-procedure debsecan_Abbrev is
+procedure Debsecan_Abbrev is
 
   ----------------------------------------------------------------------------
   -- Thick binding to System call.
@@ -74,36 +73,9 @@ procedure debsecan_Abbrev is
   end record;
 
   ----------------------------------------------------------------------------
-  -- Return directory for cache data used by debsecan_abbrev.
-  function Cache_Home return String
-  is
-    Tmp: constant String := XDG.Cache_Home;
-    Dir: constant String := "debsecan_abbrev/";
-  begin
-    if Tmp (Tmp'Last .. Tmp'Last) = "/" then
-      return Tmp & Dir;
-    else
-      return Tmp & '/' & Dir;
-    end if;
-  end Cache_Home;
-
-  ----------------------------------------------------------------------------
-  -- Check if Cache_Home exists and if it is directory. If it doesn't exist
-  -- create path to Cache_Home. If it isn't directory raise Program_Error.
-  procedure Create_Cache_Home
-  is
-    package AD renames Ada.Directories;
-    use type AD.File_Kind;
-  begin
-    if AD.Exists (Cache_Home) then
-      if AD.Kind (Cache_Home) /= AD.Directory then
-        raise Program_Error with  "Fatal Error: " & Cache_Home &
-                                  " exists but isn't directory";
-      end if;
-    else
-      AD.Create_Path (Cache_Home);
-    end if;
-  end Create_Cache_Home;
+  -- Directory used for storing program specific files.
+  Directory : constant String := "debsecan_abbrev/";
+  Cache_Home: constant String := XDG.Cache_Home (Directory);
 
   ----------------------------------------------------------------------------
   -- Check if two Package_Security_Info are describing the same package.
@@ -261,7 +233,12 @@ procedure debsecan_Abbrev is
   Parsed_Summary: Package_Security_Info_Vectors.Vector;
 
 begin
-  Create_Cache_Home;
+  if XDG.Is_Valid_Cache_Home (Directory) then
+    XDG.Create_Cache_Home (Directory);
+  else
+    raise Program_Error with  "Fatal Error: " & XDG.Cache_Home (Directory) &
+                                  " exists but isn't directory";
+  end if;
   System ("debsecan >" & Cache_Home & "summary");
   Parsed_Summary := Parse_Summary;
   Package_Security_Info_Vectors_Sort.Sort (Parsed_Summary);
