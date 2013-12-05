@@ -75,7 +75,6 @@ procedure Debsecan_Abbrev is
   ----------------------------------------------------------------------------
   -- Directory used for storing program specific files.
   Directory : constant String := "debsecan_abbrev/";
-  Cache_Home: constant String := XDG.Cache_Home (Directory);
 
   ----------------------------------------------------------------------------
   -- Check if two Package_Security_Info are describing the same package.
@@ -159,7 +158,7 @@ procedure Debsecan_Abbrev is
     end Pos_Of_First_Space;
 
   begin
-    TIO.Open (FD, TIO.In_File, Cache_Home & "summary");
+    TIO.Open (FD, TIO.In_File, XDG.Cache_Home (Directory) & "summary");
 
     Parse:
     while not TIO.End_Of_File (FD) loop
@@ -239,7 +238,7 @@ begin
     raise Program_Error with  "Fatal Error: " & XDG.Cache_Home (Directory) &
                                   " exists but isn't directory";
   end if;
-  System ("debsecan >" & Cache_Home & "summary");
+  System ("debsecan >" & XDG.Cache_Home (Directory) & "summary");
   Parsed_Summary := Parse_Summary;
   Package_Security_Info_Vectors_Sort.Sort (Parsed_Summary);
   Parsed_Summary := Parsed_Summary & Total (Parsed_Summary);

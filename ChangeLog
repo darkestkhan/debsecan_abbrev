@@ -2,7 +2,6 @@
 
 	* src/debsecan_abbrev.adb (Cache_Home, Create_Cache_Home):
 	Delete subprograms as their functionality is now fullfiled by libxdg.
-	(Cache_Home): New variable.
 
 2013-11-27  darkestkhan  <darkestkhan@gmail.com>
 
