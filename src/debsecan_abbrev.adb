@@ -178,7 +178,7 @@ procedure Debsecan_Abbrev is
         else
           Element.Hash_Of_Name :=
             Ada.Strings.Hash
-              ( Line (Start_Of_Package_Name .. End_Of_Package_Name)
+              ( Line (Start_Of_Package_Name .. End_Of_Package_Name - 1)
               );
         end if;
 
