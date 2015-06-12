@@ -23,3 +23,6 @@ $ ./debsecan_abbrev
 [count of vulnerabilities] [name of affected package]
 
 Depends on https://github.com/darkestkhan/xdg
+
+To build for particular CPU use -XCPU="cpu settings", defaults to
+"-m64 -mssse3 -fPIC -march=native".
