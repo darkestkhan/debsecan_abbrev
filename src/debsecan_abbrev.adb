@@ -45,7 +45,7 @@ procedure Debsecan_Abbrev is
   is
     use type Interfaces.C.int;
 
-    function System (Command: in Interfaces.C.Char_Array)
+    function System (Command: in Interfaces.C.char_array)
       return Interfaces.C.int;
     pragma Import (StdCall, System, "system");
     Result: constant Interfaces.C.int := System (Interfaces.C.To_C (Command));
@@ -67,7 +67,7 @@ procedure Debsecan_Abbrev is
 
   type Package_Security_Info is
   record
-    Package_Name  : String_Access := Null;
+    Package_Name  : String_Access := null;
     Hash_Of_Name  : Ada.Containers.Hash_Type;
     Security      : Natural := 0;
   end record;
@@ -79,7 +79,7 @@ procedure Debsecan_Abbrev is
   ----------------------------------------------------------------------------
   -- Check if two Package_Security_Info are describing the same package.
   -- NOTE that this doesn't check if two records are identical.
-  function "=" (Left, Right: in Package_Security_Info) return Boolean
+  overriding function "=" (Left, Right: in Package_Security_Info) return Boolean
   is
   begin
     return Left.Hash_Of_Name = Right.Hash_Of_Name;
@@ -166,7 +166,8 @@ procedure Debsecan_Abbrev is
         package PSIV renames Package_Security_Info_Vectors;
         Line: constant String := TIO.Get_Line (FD);
         Element: Package_Security_Info;
-        Start_Of_Package_Name: constant Natural := Pos_Of_First_Space (Line) + 1;
+        Start_Of_Package_Name: constant Natural :=
+          Pos_Of_First_Space (Line) + 1;
         End_Of_Package_Name  : constant Natural :=
           Fixed.Index (Line, " ", Start_Of_Package_Name );
       begin
@@ -243,4 +244,4 @@ begin
   Package_Security_Info_Vectors_Sort.Sort (Parsed_Summary);
   Parsed_Summary := Parsed_Summary & Total (Parsed_Summary);
   Put_Package_Security_Info_Vector (Parsed_Summary);
-end debsecan_Abbrev;
+end Debsecan_Abbrev;
