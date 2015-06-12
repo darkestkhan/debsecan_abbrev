@@ -24,5 +24,5 @@ $ ./debsecan_abbrev
 
 Depends on https://github.com/darkestkhan/xdg
 
-To build for particular CPU use -XCPU="cpu settings", defaults to
-"-m64 -mssse3 -fPIC -march=native".
+To build for particular CPU add -XCPU="cpu settings" to gprbuild command.
+Defaults to "-m64 -mssse3 -fPIC -march=native".
